@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUSPENDIK - CBT Application</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .watermark {
+            background-image: url('https://freeimage.host/i/FUrEA0v');
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 200px;
+            opacity: 0.1;
+        }
+        .question-nav-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 2px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .question-nav-btn.current {
+            background-color: #3b82f6;
+            color: white;
+        }
+        .question-nav-btn.answered {
+            background-color: #10b981;
+            color: white;
+        }
+        .question-nav-btn.unanswered {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+        .question-nav-btn.doubt {
+            background-color: #f59e0b;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <!-- Login Page -->
+    <div id="loginPage" class="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center">
+        <div class="bg-white rounded-lg shadow-2xl p-8 w-full max-w-md">
+            <div class="text-center mb-8">
+                <img src="https://freeimage.host/i/FUrEA0v" alt="Logo" class="mx-auto mb-4 h-16">
+                <h1 class="text-2xl font-bold text-blue-800">PUSPENDIK - CBT Application</h1>
+            </div>
+            
+            <div class="bg-gray-50 rounded-lg p-6 mb-6">
+                <h2 class="text-xl font-semibold text-center mb-6 text-gray-800">Selamat Datang</h2>
+                
+                <div class="space-y-4">
+                    <div class="relative">
+                        <i class="fas fa-user absolute left-3 top-3 text-gray-400"></i>
+                        <input type="text" id="username" placeholder="Username" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    
+                    <div class="relative">
+                        <i class="fas fa-lock absolute left-3 top-3 text-gray-400"></i>
+                        <input type="password" id="password" placeholder="Password" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+                
+                <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg mt-6 transition duration-200">
+                    Login
+                </button>
+                
+                <div id="loginError" class="text-red-600 text-center mt-4 hidden">
+                    Maaf salah, hubungi Proktor
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Participant Confirmation Page -->
+    <div id="participantPage" class="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 p-6 hidden">
+        <div class="flex justify-between items-center mb-8">
+            <div class="flex items-center">
+                <img src="https://freeimage.host/i/FUrEA0v" alt="Logo" class="h-12 mr-3">
+                <h1 class="text-white text-xl font-bold">PUSMENJAR CBT Application</h1>
+            </div>
+            <div class="text-white">
+                <span id="currentUser">sesuai pengguna</span>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6 max-w-7xl mx-auto">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Foto Peserta</h2>
+                <div class="flex justify-center mb-4">
+                    <img id="participantPhoto" src="" alt="Foto Peserta" class="w-32 h-40 object-cover border-2 border-gray-300 rounded-lg" style="display: none;">
+                    <div id="noPhotoPlaceholder" class="w-32 h-40 bg-gray-200 border-2 border-gray-300 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-user text-4xl text-gray-400"></i>
+                    </div>
+                </div>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <p class="text-sm text-blue-800">Pastikan foto yang ditampilkan sesuai dengan identitas Anda.</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Informasi Token</h2>
+                <p class="text-gray-600 mb-4">Silakan masukkan token ujian yang telah diberikan oleh proktor untuk melanjutkan ke tahap konfirmasi data peserta.</p>
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <p class="text-sm text-blue-800">Pastikan semua data yang Anda masukkan sudah benar sebelum melanjutkan ke tahap ujian.</p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Konfirmasi Data Peserta</h2>
+                <form class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
+                        <input type="text" id="fullName" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Jenis Kelamin</label>
+                        <select id="gender" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                            <option value="">Pilih Jenis Kelamin</option>
+                            <option value="L">Laki-laki</option>
+                            <option value="P">Perempuan</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">NISN</label>
+                        <input type="text" id="nisn" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Asal Sekolah</label>
+                        <input type="text" id="school" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal Lahir</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <select id="birthDay" class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                <option value="">Hari</option>
+                            </select>
+                            <select id="birthMonth" class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                <option value="">Bulan</option>
+                            </select>
+                            <select id="birthYear" class="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                                <option value="">Tahun</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Token Ujian</label>
+                        <input type="text" id="examToken" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    
+                    <button type="button" onclick="submitParticipantData()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
+                        Submit
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Confirmation Page -->
+    <div id="testConfirmPage" class="min-h-screen bg-gradient-to-br from-blue-600 to-blue-800 hidden">
+        <div class="bg-blue-700 p-4">
+            <div class="flex justify-between items-center max-w-6xl mx-auto">
+                <div class="flex items-center">
+                    <img src="https://freeimage.host/i/FUrEA0v" alt="Logo" class="h-10 mr-3">
+                    <h1 class="text-white text-lg font-bold">PUSMENJAR CBT Application</h1>
+                </div>
+                <div class="text-white">
+                    <i class="fas fa-user-circle mr-2"></i>
+                    <span id="userProfile">sesuai pengguna</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-center min-h-screen p-6">
+            <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full watermark relative">
+                <div class="text-center">
+                    <h2 class="text-2xl font-bold mb-6 text-gray-800">Konfirmasi Tes</h2>
+                    
+                    <div class="space-y-4 text-left mb-8">
+                        <div class="flex justify-between">
+                            <span class="font-medium text-gray-600">Nama Tes:</span>
+                            <span class="text-gray-800">Tes Literasi SMP</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-gray-600">Jenis Tes:</span>
+                            <span class="text-gray-800">CBT Online</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-gray-600">Waktu:</span>
+                            <span class="text-gray-800" id="currentTime"></span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="font-medium text-gray-600">Alokasi Waktu:</span>
+                            <span class="text-gray-800">90 Menit</span>
+                        </div>
+                    </div>
+                    
+                    <button onclick="startTest()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-lg text-lg transition duration-200">
+                        MULAI
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stage Confirmation Modal -->
+    <div id="stageModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h3 class="text-xl font-bold mb-4 text-center">Konfirmasi Tahap Baru</h3>
+            <p id="stageMessage" class="text-gray-600 mb-6 text-center"></p>
+            <div class="flex gap-4">
+                <button onclick="closeStageModal()" class="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                    Batal
+                </button>
+                <button onclick="confirmStage()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    Mulai
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Test Page -->
+    <div id="testPage" class="min-h-screen bg-gray-100 hidden">
+        <!-- Header -->
+        <div class="bg-blue-700 p-4 shadow-lg">
+            <div class="flex justify-between items-center max-w-7xl mx-auto">
+                <div class="flex items-center">
+                    <img src="https://freeimage.host/i/FUrEA0v" alt="Logo" class="h-10 mr-3">
+                    <h1 class="text-white text-lg font-bold">PUSPENDIK - CBT</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="bg-red-600 text-white px-4 py-2 rounded-lg font-bold">
+                        <i class="fas fa-clock mr-2"></i>
+                        <span id="timer">90:00</span>
+                    </div>
+                    <button onclick="toggleQuestionList()" class="bg-blue-600 hover:bg-blue-800 text-white px-4 py-2 rounded-lg">
+                        Daftar Soal
+                    </button>
+                    <div class="flex items-center text-white">
+                        <img id="testUserPhoto" src="" alt="Foto" class="w-8 h-8 rounded-full object-cover mr-2 border-2 border-white" style="display: none;">
+                        <i id="testUserIcon" class="fas fa-user-circle mr-2"></i>
+                        <span id="testUserName">Peserta</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question List Modal -->
+        <div id="questionListModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+            <div class="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-96 overflow-y-auto">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold">Daftar Soal</h3>
+                    <button onclick="toggleQuestionList()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div id="questionGrid" class="grid grid-cols-10 gap-2"></div>
+                <div class="mt-4 flex justify-center">
+                    <button onclick="toggleQuestionList()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto p-6">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <!-- Question Header -->
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-800">
+                        <span id="currentStage">Stage 1: Soal Pilihan Ganda</span>
+                    </h2>
+                    <div class="text-sm text-gray-600">
+                        Soal <span id="currentQuestionNum">1</span> dari <span id="totalQuestions">20</span>
+                    </div>
+                </div>
+
+                <!-- Question Content -->
+                <div id="questionContent" class="mb-8">
+                    <!-- Question will be loaded here -->
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="flex justify-between items-center">
+                    <button onclick="previousQuestion()" id="prevBtn" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-6 rounded-lg disabled:opacity-50">
+                        Soal Sebelumnya
+                    </button>
+                    
+                    <div class="flex space-x-4">
+                        <button onclick="markDoubt()" class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-6 rounded-lg">
+                            Ragu-Ragu
+                        </button>
+                        <button onclick="nextQuestion()" id="nextBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-lg">
+                            Soal Selanjutnya
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // User data from Google Sheets
+        let userData = {};
+        let participantData = {};
+        
+        // Fetch user data from Google Sheets
+        async function loadUserData() {
+            try {
+                const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vRRhIOEZfjxpHX94SZj8kXt3eAYlGOWBAIYzaYQhYppNFScG9nGFeKlIpk_SUwIGWCfeOeWdQGATh5k/pub?output=csv');
+                const csvText = await response.text();
+                const lines = csvText.split('\n');
+                
+                // Parse CSV data (skip header if exists)
+                for (let i = 1; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    if (line) {
+                        const columns = line.split(',').map(item => item.replace(/"/g, '').trim());
+                        if (columns.length >= 6) {
+                            const [username, password, fullName, gender, nisn, school, photo] = columns;
+                            if (username && password) {
+                                userData[username] = password;
+                                participantData[username] = {
+                                    fullName: fullName || '',
+                                    gender: gender || '',
+                                    nisn: nisn || '',
+                                    school: school || '',
+                                    photo: photo || ''
+                                };
+                            }
+                        }
+                    }
+                }
+                console.log('User data loaded:', Object.keys(userData).length, 'users');
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                // Fallback data for testing
+                userData = {
+                    'siswa1': 'pass123',
+                    'siswa2': 'pass456',
+                    'admin': 'admin123',
+                    'test': 'test'
+                };
+                participantData = {
+                    'siswa1': { fullName: 'Siswa Satu', gender: 'L', nisn: '1234567890', school: 'SMP Negeri 1', photo: '' },
+                    'siswa2': { fullName: 'Siswa Dua', gender: 'P', nisn: '0987654321', school: 'SMP Negeri 2', photo: '' }
+                };
+            }
+        }
+
+        // Test data
+        let currentStage = 1;
+        let currentQuestion = 0;
+        let answers = {};
+        let doubtQuestions = new Set();
+        let timeRemaining = 90 * 60; // 90 minutes in seconds
+
+        // Questions data
+        const questions = {
+            stage1: {
+                title: "Stage 1: Soal Pilihan Ganda",
+                questions: [
+                    {
+                        type: "multiple_choice",
+                        question: "Bacalah teks berikut!\n\n\"Pendidikan adalah kunci utama kemajuan suatu bangsa. Melalui pendidikan yang berkualitas, generasi muda dapat mengembangkan potensi diri dan berkontribusi bagi masyarakat.\"\n\nIde pokok paragraf tersebut adalah...",
+                        options: ["Generasi muda harus berkontribusi", "Pendidikan berkualitas sangat penting", "Pendidikan adalah kunci kemajuan bangsa", "Potensi diri perlu dikembangkan", "Masyarakat membutuhkan kontribusi"],
+                        correct: "C"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Perhatikan kalimat berikut!\n\n\"Buku itu sangat menarik sehingga saya membacanya hingga larut malam.\"\n\nKonjungsi yang digunakan dalam kalimat tersebut adalah...",
+                        options: ["Koordinatif", "Subordinatif", "Korelatif", "Temporal", "Kausal"],
+                        correct: "B"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Makna kata 'komprehensif' dalam kalimat \"Laporan penelitian harus dibuat secara komprehensif\" adalah...",
+                        options: ["Singkat dan padat", "Lengkap dan menyeluruh", "Mudah dipahami", "Berdasarkan fakta", "Objektif dan jelas"],
+                        correct: "B"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Bacalah paragraf berikut!\n\n\"Sampah plastik menjadi masalah serius bagi lingkungan. Plastik membutuhkan waktu ratusan tahun untuk terurai. Oleh karena itu, kita harus mengurangi penggunaan plastik sekali pakai.\"\n\nPola pengembangan paragraf tersebut adalah...",
+                        options: ["Deduktif", "Induktif", "Campuran", "Naratif", "Deskriptif"],
+                        correct: "A"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Kata yang mengalami proses afiksasi dengan imbuhan me-kan adalah...",
+                        options: ["Membaca", "Menuliskan", "Berlari", "Tertawa", "Berjalan"],
+                        correct: "B"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Bacalah puisi berikut!\n\n\"Hujan turun membasahi bumi\nTanaman hijau tampak segar\nUdara bersih menyejukkan hati\nAku bersyukur pada Yang Kuasa\"\n\nTema puisi tersebut adalah...",
+                        options: ["Cinta tanah air", "Keindahan alam", "Rasa syukur", "Kehidupan sehari-hari", "Perubahan cuaca"],
+                        correct: "C"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Kalimat yang menggunakan majas personifikasi adalah...",
+                        options: ["Wajahnya putih seperti kapas", "Angin berbisik di telingaku", "Suaranya keras seperti guntur", "Dia cantik bagai bidadari", "Matanya tajam seperti elang"],
+                        correct: "B"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Bacalah teks berikut!\n\n\"Teknologi digital telah mengubah cara kita berkomunikasi. Media sosial memungkinkan kita terhubung dengan orang di seluruh dunia. Namun, penggunaan yang berlebihan dapat menimbulkan dampak negatif.\"\n\nSimpulan yang tepat dari teks tersebut adalah...",
+                        options: ["Teknologi digital selalu berdampak negatif", "Media sosial harus dihindari", "Teknologi digital perlu digunakan dengan bijak", "Komunikasi tradisional lebih baik", "Teknologi digital tidak bermanfaat"],
+                        correct: "C"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Struktur teks eksposisi yang benar adalah...",
+                        options: ["Orientasi - komplikasi - resolusi", "Tesis - argumentasi - penegasan ulang", "Pernyataan umum - aspek yang dilaporkan", "Identifikasi - deskripsi", "Abstrak - orientasi - krisis"],
+                        correct: "B"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Kata baku yang tepat untuk menggantikan kata 'aktifitas' adalah...",
+                        options: ["Aktivitas", "Aktifitas", "Aktipitas", "Aktivitas", "Aktifitas"],
+                        correct: "A"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Bacalah kalimat berikut!\n\n\"Meskipun hujan deras, para siswa tetap berangkat ke sekolah.\"\n\nJenis kalimat berdasarkan strukturnya adalah...",
+                        options: ["Kalimat tunggal", "Kalimat majemuk setara", "Kalimat majemuk bertingkat", "Kalimat majemuk campuran", "Kalimat kompleks"],
+                        correct: "C"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Fungsi bahasa dalam kalimat \"Tolong ambilkan buku di atas meja!\" adalah...",
+                        options: ["Informatif", "Ekspresif", "Direktif", "Fatik", "Metalingual"],
+                        correct: "C"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Bacalah pantun berikut!\n\n\"Buah mangga masih di pohon\nBelum masak rasanya pahit\nJika adik rajin belajar\nCita-cita pasti tercapai\"\n\nPesan moral pantun tersebut adalah...",
+                        options: ["Buah mangga enak dimakan", "Belajar itu penting", "Ketekunan membawa hasil", "Cita-cita harus realistis", "Anak harus patuh pada orang tua"],
+                        correct: "C"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Kata yang memiliki makna konotasi dalam kalimat \"Dia memiliki hati yang bersih\" adalah...",
+                        options: ["Dia", "Memiliki", "Hati", "Yang", "Bersih"],
+                        correct: "C"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Bacalah teks berikut!\n\n\"Perpustakaan adalah jantung sekolah. Di sanalah siswa dapat mengembangkan wawasan dan pengetahuan melalui berbagai koleksi buku yang tersedia.\"\n\nMajas yang digunakan dalam kalimat pertama adalah...",
+                        options: ["Personifikasi", "Metafora", "Simile", "Hiperbola", "Alegori"],
+                        correct: "B"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Penulisan alamat surat yang benar adalah...",
+                        options: ["Kepada Yth. Bapak Direktur", "Yth. Bapak Direktur", "Kepada Yth. Direktur", "Yang Terhormat Bapak Direktur", "Yth. Sdr. Direktur"],
+                        correct: "B"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Bacalah dialog berikut!\n\nAni: \"Bagaimana pendapatmu tentang film yang baru saja kita tonton?\"\nBudi: \"Menurutku, film itu sangat inspiratif dan mengandung pesan moral yang baik.\"\n\nJenis kalimat yang diucapkan Budi adalah...",
+                        options: ["Kalimat tanya", "Kalimat berita", "Kalimat perintah", "Kalimat seru", "Kalimat optatif"],
+                        correct: "B"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Kata yang mengalami perubahan makna meluas adalah...",
+                        options: ["Bapak (ayah → panggilan hormat untuk laki-laki)", "Sarjana (orang pandai → lulusan perguruan tinggi)", "Istri (wanita → istri)", "Guru (pengajar → panutan)", "Dokter (tabib → dokter medis)"],
+                        correct: "A"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Bacalah teks berikut!\n\n\"Gotong royong merupakan budaya luhur bangsa Indonesia. Tradisi ini telah mengakar kuat dalam kehidupan masyarakat dan menjadi identitas bangsa.\"\n\nKata 'mengakar' dalam teks tersebut bermakna...",
+                        options: ["Tumbuh seperti akar", "Tertanam dalam", "Menyebar luas", "Sulit dihilangkan", "Berkembang pesat"],
+                        correct: "B"
+                    },
+                    {
+                        type: "multiple_choice",
+                        question: "Kalimat yang menggunakan kata penghubung antarkalimat adalah...",
+                        options: ["Dia belajar dengan giat karena ingin lulus ujian", "Meskipun hujan, kami tetap berangkat", "Kami akan pergi ke pantai. Namun, cuaca tidak mendukung", "Dia pintar dan rajin belajar", "Ayah membaca koran sambil minum kopi"],
+                        correct: "C"
+                    }
+                ]
+            },
+            stage2: {
+                title: "Stage 2: Soal Pilihan Ganda Kompleks",
+                questions: [
+                    {
+                        type: "complex_multiple_choice",
+                        question: "Perhatikan pernyataan-pernyataan berikut tentang teks eksposisi:",
+                        statements: [
+                            "Teks eksposisi bertujuan memberikan informasi",
+                            "Struktur teks eksposisi: tesis, argumentasi, penegasan ulang",
+                            "Teks eksposisi menggunakan bahasa yang objektif",
+                            "Teks eksposisi selalu berisi cerita fiksi"
+                        ],
+                        options: ["1, 2, dan 3", "1, 2, dan 4", "2, 3, dan 4", "1, 3, dan 4", "Semua benar"],
+                        correct: "A"
+                    },
+                    {
+                        type: "complex_multiple_choice",
+                        question: "Perhatikan pernyataan tentang puisi berikut:",
+                        statements: [
+                            "Puisi memiliki unsur intrinsik dan ekstrinsik",
+                            "Rima adalah persamaan bunyi dalam puisi",
+                            "Majas adalah gaya bahasa dalam puisi",
+                            "Puisi selalu terdiri dari 4 bait"
+                        ],
+                        options: ["1, 2, dan 3", "1, 2, dan 4", "2, 3, dan 4", "1, 3, dan 4", "Semua benar"],
+                        correct: "A"
+                    },
+                    {
+                        type: "complex_multiple_choice",
+                        question: "Perhatikan pernyataan tentang kalimat efektif berikut:",
+                        statements: [
+                            "Kalimat efektif memiliki subjek dan predikat yang jelas",
+                            "Kalimat efektif menggunakan kata-kata yang hemat",
+                            "Kalimat efektif mudah dipahami pembaca",
+                            "Kalimat efektif selalu menggunakan kata baku"
+                        ],
+                        options: ["1, 2, dan 3", "1, 2, dan 4", "1, 3, dan 4", "2, 3, dan 4", "Semua benar"],
+                        correct: "E"
+                    },
+                    {
+                        type: "complex_multiple_choice",
+                        question: "Perhatikan pernyataan tentang teks berita berikut:",
+                        statements: [
+                            "Teks berita harus memuat unsur 5W + 1H",
+                            "Teks berita menggunakan bahasa yang objektif",
+                            "Teks berita memiliki struktur: judul, teras, tubuh berita",
+                            "Teks berita boleh memuat opini penulis"
+                        ],
+                        options: ["1, 2, dan 3", "1, 2, dan 4", "2, 3, dan 4", "1, 3, dan 4", "Semua benar"],
+                        correct: "A"
+                    },
+                    {
+                        type: "complex_multiple_choice",
+                        question: "Perhatikan pernyataan tentang pantun berikut:",
+                        statements: [
+                            "Pantun terdiri dari 4 baris dalam 1 bait",
+                            "Pantun memiliki pola rima a-b-a-b",
+                            "Baris 1-2 pantun disebut sampiran",
+                            "Baris 3-4 pantun berisi isi atau pesan"
+                        ],
+                        options: ["1, 2, dan 3", "1, 2, dan 4", "1, 3, dan 4", "2, 3, dan 4", "Semua benar"],
+                        correct: "E"
+                    },
+                    {
+                        type: "complex_multiple_choice",
+                        question: "Perhatikan pernyataan tentang majas berikut:",
+                        statements: [
+                            "Personifikasi adalah majas yang memberikan sifat manusia pada benda",
+                            "Metafora adalah perbandingan langsung tanpa kata pembanding",
+                            "Simile adalah perbandingan menggunakan kata 'seperti' atau 'bagai'",
+                            "Hiperbola adalah majas yang melebih-lebihkan"
+                        ],
+                        options: ["1, 2, dan 3", "1, 2, dan 4", "1, 3, dan 4", "2, 3, dan 4", "Semua benar"],
+                        correct: "E"
+                    },
+                    {
+                        type: "complex_multiple_choice",
+                        question: "Perhatikan pernyataan tentang surat resmi berikut:",
+                        statements: [
+                            "Surat resmi menggunakan bahasa baku",
+                            "Surat resmi memiliki kop surat",
+                            "Surat resmi menggunakan format yang standar",
+                            "Surat resmi boleh menggunakan bahasa gaul"
+                        ],
+                        options: ["1, 2, dan 3", "1, 2, dan 4", "2, 3, dan 4", "1, 3, dan 4", "Semua benar"],
+                        correct: "A"
+                    },
+                    {
+                        type: "complex_multiple_choice",
+                        question: "Perhatikan pernyataan tentang teks deskripsi berikut:",
+                        statements: [
+                            "Teks deskripsi menggambarkan objek secara detail",
+                            "Teks deskripsi menggunakan panca indera",
+                            "Teks deskripsi bertujuan membuat pembaca seolah melihat objek",
+                            "Teks deskripsi selalu berisi argumentasi"
+                        ],
+                        options: ["1, 2, dan 3", "1, 2, dan 4", "2, 3, dan 4", "1, 3, dan 4", "Semua benar"],
+                        correct: "A"
+                    },
+                    {
+                        type: "complex_multiple_choice",
+                        question: "Perhatikan pernyataan tentang kata baku berikut:",
+                        statements: [
+                            "Kata baku sesuai dengan kaidah bahasa Indonesia",
+                            "Kata baku digunakan dalam situasi formal",
+                            "Kata baku tercantum dalam KBBI",
+                            "Kata baku tidak pernah berubah"
+                        ],
+                        options: ["1, 2, dan 3", "1, 2, dan 4", "2, 3, dan 4", "1, 3, dan 4", "Semua benar"],
+                        correct: "A"
+                    },
+                    {
+                        type: "complex_multiple_choice",
+                        question: "Perhatikan pernyataan tentang cerpen berikut:",
+                        statements: [
+                            "Cerpen memiliki alur yang sederhana",
+                            "Cerpen fokus pada satu konflik utama",
+                            "Cerpen memiliki tokoh yang terbatas",
+                            "Cerpen selalu berakhir dengan kebahagiaan"
+                        ],
+                        options: ["1, 2, dan 3", "1, 2, dan 4", "2, 3, dan 4", "1, 3, dan 4", "Semua benar"],
+                        correct: "A"
+                    }
+                ]
+            },
+            stage3: {
+                title: "Stage 3: Soal Memasangkan",
+                questions: [
+                    {
+                        type: "matching",
+                        question: "Pasangkan jenis teks dengan ciri-cirinya yang tepat:",
+                        leftItems: ["Teks Eksposisi", "Teks Deskripsi", "Teks Narasi", "Teks Argumentasi"],
+                        rightItems: ["Menceritakan peristiwa", "Menggambarkan objek", "Memberikan informasi", "Meyakinkan pembaca"],
+                        correct: {"Teks Eksposisi": "Memberikan informasi", "Teks Deskripsi": "Menggambarkan objek", "Teks Narasi": "Menceritakan peristiwa", "Teks Argumentasi": "Meyakinkan pembaca"}
+                    },
+                    {
+                        type: "matching",
+                        question: "Pasangkan majas dengan contohnya yang tepat:",
+                        leftItems: ["Personifikasi", "Metafora", "Simile", "Hiperbola"],
+                        rightItems: ["Cantik bagai bidadari", "Angin berbisik lembut", "Dia adalah matahari hatiku", "Suaranya menggelegar"],
+                        correct: {"Personifikasi": "Angin berbisik lembut", "Metafora": "Dia adalah matahari hatiku", "Simile": "Cantik bagai bidadari", "Hiperbola": "Suaranya menggelegar"}
+                    },
+                    {
+                        type: "matching",
+                        question: "Pasangkan unsur intrinsik cerpen dengan pengertiannya:",
+                        leftItems: ["Tema", "Alur", "Tokoh", "Latar"],
+                        rightItems: ["Tempat dan waktu", "Gagasan utama", "Jalannya cerita", "Pelaku cerita"],
+                        correct: {"Tema": "Gagasan utama", "Alur": "Jalannya cerita", "Tokoh": "Pelaku cerita", "Latar": "Tempat dan waktu"}
+                    },
+                    {
+                        type: "matching",
+                        question: "Pasangkan jenis kalimat dengan contohnya:",
+                        leftItems: ["Kalimat Tanya", "Kalimat Berita", "Kalimat Perintah", "Kalimat Seru"],
+                        rightItems: ["Wah, indah sekali!", "Tutup pintu itu!", "Hari ini hujan deras", "Siapa namamu?"],
+                        correct: {"Kalimat Tanya": "Siapa namamu?", "Kalimat Berita": "Hari ini hujan deras", "Kalimat Perintah": "Tutup pintu itu!", "Kalimat Seru": "Wah, indah sekali!"}
+                    },
+                    {
+                        type: "matching",
+                        question: "Pasangkan kata dengan jenis kata yang tepat:",
+                        leftItems: ["Berlari", "Indah", "Rumah", "Dengan"],
+                        rightItems: ["Kata benda", "Kata kerja", "Kata sifat", "Kata depan"],
+                        correct: {"Berlari": "Kata kerja", "Indah": "Kata sifat", "Rumah": "Kata benda", "Dengan": "Kata depan"}
+                    }
+                ]
+            },
+            stage4: {
+                title: "Stage 4: Jawaban Singkat",
+                questions: [
+                    {
+                        type: "short_answer",
+                        question: "Sebutkan struktur teks eksposisi secara berurutan! (pisahkan dengan tanda koma)",
+                        correct: "tesis, argumentasi, penegasan ulang"
+                    },
+                    {
+                        type: "short_answer",
+                        question: "Apa nama majas dalam kalimat 'Bulan tersenyum dari balik awan'?",
+                        correct: "personifikasi"
+                    },
+                    {
+                        type: "short_answer",
+                        question: "Berapa jumlah baris dalam satu bait pantun?",
+                        correct: "4"
+                    },
+                    {
+                        type: "short_answer",
+                        question: "Sebutkan unsur 5W dalam teks berita! (pisahkan dengan tanda koma)",
+                        correct: "what, who, when, where, why"
+                    },
+                    {
+                        type: "short_answer",
+                        question: "Apa sebutan untuk baris 1-2 dalam pantun?",
+                        correct: "sampiran"
+                    }
+                ]
+            },
+            stage5: {
+                title: "Stage 5: Survey Lingkungan Belajar",
+                questions: [
+                    {
+                        type: "survey",
+                        question: "Saya merasa nyaman dengan lingkungan belajar di sekolah.",
+                        options: ["Tidak Setuju", "Kurang Setuju", "Setuju", "Sangat Setuju"]
+                    },
+                    {
+                        type: "survey",
+                        question: "Guru memberikan penjelasan yang mudah dipahami saat pembelajaran.",
+                        options: ["Tidak Setuju", "Kurang Setuju", "Setuju", "Sangat Setuju"]
+                    },
+                    {
+                        type: "survey",
+                        question: "Fasilitas perpustakaan sekolah mendukung kegiatan belajar saya.",
+                        options: ["Tidak Setuju", "Kurang Setuju", "Setuju", "Sangat Setuju"]
+                    },
+                    {
+                        type: "survey",
+                        question: "Saya dapat berkonsentrasi dengan baik selama pembelajaran di kelas.",
+                        options: ["Tidak Setuju", "Kurang Setuju", "Setuju", "Sangat Setuju"]
+                    },
+                    {
+                        type: "survey",
+                        question: "Teman-teman di kelas saling membantu dalam belajar.",
+                        options: ["Tidak Setuju", "Kurang Setuju", "Setuju", "Sangat Setuju"]
+                    },
+                    {
+                        type: "survey",
+                        question: "Metode pembelajaran yang digunakan guru menarik dan bervariasi.",
+                        options: ["Tidak Setuju", "Kurang Setuju", "Setuju", "Sangat Setuju"]
+                    },
+                    {
+                        type: "survey",
+                        question: "Saya merasa termotivasi untuk belajar lebih giat di sekolah.",
+                        options: ["Tidak Setuju", "Kurang Setuju", "Setuju", "Sangat Setuju"]
+                    },
+                    {
+                        type: "survey",
+                        question: "Lingkungan sekolah bersih dan kondusif untuk belajar.",
+                        options: ["Tidak Setuju", "Kurang Setuju", "Setuju", "Sangat Setuju"]
+                    },
+                    {
+                        type: "survey",
+                        question: "Saya dapat mengakses sumber belajar dengan mudah di sekolah.",
+                        options: ["Tidak Setuju", "Kurang Setuju", "Setuju", "Sangat Setuju"]
+                    },
+                    {
+                        type: "survey",
+                        question: "Saya merasa dihargai dan didengar pendapatnya oleh guru dan teman.",
+                        options: ["Tidak Setuju", "Kurang Setuju", "Setuju", "Sangat Setuju"]
+                    }
+                ]
+            }
+        };
+
+        // Initialize date dropdowns
+        function initializeDateDropdowns() {
+            const daySelect = document.getElementById('birthDay');
+            const monthSelect = document.getElementById('birthMonth');
+            const yearSelect = document.getElementById('birthYear');
+
+            // Days
+            for (let i = 1; i <= 31; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                daySelect.appendChild(option);
+            }
+
+            // Months
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+                           'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            months.forEach((month, index) => {
+                const option = document.createElement('option');
+                option.value = index + 1;
+                option.textContent = month;
+                monthSelect.appendChild(option);
+            });
+
+            // Years
+            const currentYear = new Date().getFullYear();
+            for (let i = currentYear - 30; i <= currentYear - 10; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                yearSelect.appendChild(option);
+            }
+        }
+
+        // Login function
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+
+            if (userData[username] && userData[username] === password) {
+                document.getElementById('loginPage').classList.add('hidden');
+                document.getElementById('participantPage').classList.remove('hidden');
+                document.getElementById('currentUser').textContent = username;
+                
+                // Pre-fill participant data if available
+                if (participantData[username]) {
+                    const data = participantData[username];
+                    document.getElementById('fullName').value = data.fullName;
+                    document.getElementById('gender').value = data.gender;
+                    document.getElementById('nisn').value = data.nisn;
+                    document.getElementById('school').value = data.school;
+                    
+                    // Show participant photo if available
+                    if (data.photo && data.photo.trim() !== '') {
+                        document.getElementById('participantPhoto').src = data.photo;
+                        document.getElementById('participantPhoto').style.display = 'block';
+                        document.getElementById('noPhotoPlaceholder').style.display = 'none';
+                    } else {
+                        document.getElementById('participantPhoto').style.display = 'none';
+                        document.getElementById('noPhotoPlaceholder').style.display = 'flex';
+                    }
+                }
+                
+                errorDiv.classList.add('hidden');
+            } else {
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        // Submit participant data
+        function submitParticipantData() {
+            const fullName = document.getElementById('fullName').value;
+            const gender = document.getElementById('gender').value;
+            const nisn = document.getElementById('nisn').value;
+            const school = document.getElementById('school').value;
+            const token = document.getElementById('examToken').value;
+            const username = document.getElementById('currentUser').textContent;
+
+            if (fullName && gender && nisn && school && token) {
+                document.getElementById('participantPage').classList.add('hidden');
+                document.getElementById('testConfirmPage').classList.remove('hidden');
+                document.getElementById('userProfile').textContent = fullName;
+                
+                // Set test user name and photo
+                document.getElementById('testUserName').textContent = fullName;
+                if (participantData[username] && participantData[username].photo && participantData[username].photo.trim() !== '') {
+                    document.getElementById('testUserPhoto').src = participantData[username].photo;
+                    document.getElementById('testUserPhoto').style.display = 'block';
+                    document.getElementById('testUserIcon').style.display = 'none';
+                } else {
+                    document.getElementById('testUserPhoto').style.display = 'none';
+                    document.getElementById('testUserIcon').style.display = 'inline';
+                }
+                
+                updateCurrentTime();
+            } else {
+                alert('Mohon lengkapi semua data!');
+            }
+        }
+
+        // Update current time
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('id-ID');
+            document.getElementById('currentTime').textContent = timeString;
+        }
+
+        // Start test
+        function startTest() {
+            document.getElementById('testConfirmPage').classList.add('hidden');
+            document.getElementById('testPage').classList.remove('hidden');
+            initializeTest();
+            startTimer();
+        }
+
+        // Shuffle array function
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // Randomize questions for each user
+        function randomizeQuestions() {
+            // Create a seed based on username for consistent randomization per user
+            const username = document.getElementById('currentUser').textContent;
+            let seed = 0;
+            for (let i = 0; i < username.length; i++) {
+                seed += username.charCodeAt(i);
+            }
+            
+            // Use seed to create pseudo-random but consistent order
+            Math.seedrandom = function(seed) {
+                const m = 0x80000000; // 2**31
+                const a = 1103515245;
+                const c = 12345;
+                let state = seed ? seed : Math.floor(Math.random() * (m - 1));
+                
+                return function() {
+                    state = (a * state + c) % m;
+                    return state / (m - 1);
+                };
+            };
+            
+            const rng = Math.seedrandom(seed);
+            
+            // Randomize questions for each stage
+            Object.keys(questions).forEach(stageKey => {
+                const stageQuestions = questions[stageKey].questions;
+                
+                // Fisher-Yates shuffle with seeded random
+                for (let i = stageQuestions.length - 1; i > 0; i--) {
+                    const j = Math.floor(rng() * (i + 1));
+                    [stageQuestions[i], stageQuestions[j]] = [stageQuestions[j], stageQuestions[i]];
+                }
+                
+                // For stages with more questions than needed, select subset
+                if (stageKey === 'stage1' && stageQuestions.length > 20) {
+                    questions[stageKey].questions = stageQuestions.slice(0, 20);
+                } else if (stageKey === 'stage2' && stageQuestions.length > 10) {
+                    questions[stageKey].questions = stageQuestions.slice(0, 10);
+                }
+            });
+        }
+
+        // Initialize test
+        function initializeTest() {
+            randomizeQuestions(); // Randomize questions based on user
+            currentStage = 1;
+            currentQuestion = 0;
+            loadQuestion();
+            generateQuestionGrid();
+        }
+
+        // Load current question
+        function loadQuestion() {
+            const stageKey = `stage${currentStage}`;
+            const stageData = questions[stageKey];
+            const question = stageData.questions[currentQuestion];
+
+            document.getElementById('currentStage').textContent = stageData.title;
+            document.getElementById('currentQuestionNum').textContent = currentQuestion + 1;
+            document.getElementById('totalQuestions').textContent = stageData.questions.length;
+
+            const questionContent = document.getElementById('questionContent');
+            
+            if (question.type === 'multiple_choice') {
+                questionContent.innerHTML = `
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-4">${question.question}</h3>
+                        <div class="space-y-3">
+                            ${question.options.map((option, index) => `
+                                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="radio" name="answer" value="${String.fromCharCode(65 + index)}" class="mr-3" 
+                                           ${answers[getQuestionId()] === String.fromCharCode(65 + index) ? 'checked' : ''}>
+                                    <span>${String.fromCharCode(65 + index)}. ${option}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (question.type === 'complex_multiple_choice') {
+                questionContent.innerHTML = `
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-4">${question.question}</h3>
+                        <div class="mb-4">
+                            ${question.statements.map((stmt, index) => `
+                                <p class="mb-2">${index + 1}. ${stmt}</p>
+                            `).join('')}
+                        </div>
+                        <div class="space-y-3">
+                            ${question.options.map((option, index) => `
+                                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="radio" name="answer" value="${String.fromCharCode(65 + index)}" class="mr-3"
+                                           ${answers[getQuestionId()] === String.fromCharCode(65 + index) ? 'checked' : ''}>
+                                    <span>${String.fromCharCode(65 + index)}. ${option}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (question.type === 'matching') {
+                questionContent.innerHTML = `
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-4">${question.question}</h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="font-medium mb-3">Kolom A:</h4>
+                                ${question.leftItems.map((item, index) => `
+                                    <div class="p-2 border rounded mb-2">${index + 1}. ${item}</div>
+                                `).join('')}
+                            </div>
+                            <div>
+                                <h4 class="font-medium mb-3">Kolom B:</h4>
+                                ${question.rightItems.map((item, index) => `
+                                    <div class="p-2 border rounded mb-2">${String.fromCharCode(65 + index)}. ${item}</div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div class="mt-4">
+                            <label class="block text-sm font-medium mb-2">Jawaban (contoh: 1A, 2B, 3C, 4D):</label>
+                            <input type="text" name="answer" class="w-full p-3 border rounded-lg" 
+                                   value="${answers[getQuestionId()] || ''}" placeholder="Masukkan pasangan jawaban">
+                        </div>
+                    </div>
+                `;
+            } else if (question.type === 'short_answer') {
+                questionContent.innerHTML = `
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-4">${question.question}</h3>
+                        <input type="text" name="answer" class="w-full p-3 border rounded-lg" 
+                               value="${answers[getQuestionId()] || ''}" placeholder="Masukkan jawaban singkat">
+                    </div>
+                `;
+            } else if (question.type === 'survey') {
+                questionContent.innerHTML = `
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold mb-4">${question.question}</h3>
+                        <div class="space-y-3">
+                            ${question.options.map((option, index) => `
+                                <label class="flex items-center p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                                    <input type="radio" name="answer" value="${option}" class="mr-3"
+                                           ${answers[getQuestionId()] === option ? 'checked' : ''}>
+                                    <span>${option}</span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Update navigation buttons
+            document.getElementById('prevBtn').disabled = currentQuestion === 0 && currentStage === 1;
+            updateNextButton();
+        }
+
+        // Get unique question ID
+        function getQuestionId() {
+            return `stage${currentStage}_q${currentQuestion}`;
+        }
+
+        // Save answer
+        function saveAnswer() {
+            const answerInput = document.querySelector('input[name="answer"]:checked') || 
+                               document.querySelector('input[name="answer"]');
+            if (answerInput) {
+                answers[getQuestionId()] = answerInput.value;
+            }
+        }
+
+        // Previous question
+        function previousQuestion() {
+            saveAnswer();
+            if (currentQuestion > 0) {
+                currentQuestion--;
+            } else if (currentStage > 1) {
+                currentStage--;
+                currentQuestion = questions[`stage${currentStage}`].questions.length - 1;
+            }
+            loadQuestion();
+            generateQuestionGrid();
+        }
+
+        // Next question
+        function nextQuestion() {
+            saveAnswer();
+            const stageData = questions[`stage${currentStage}`];
+            
+            if (currentQuestion < stageData.questions.length - 1) {
+                currentQuestion++;
+            } else if (currentStage < 5) {
+                showStageModal(currentStage + 1);
+            } else {
+                finishTest();
+            }
+            loadQuestion();
+            generateQuestionGrid();
+        }
+
+        // Show stage confirmation modal
+        function showStageModal(nextStage) {
+            const stageNames = {
+                2: "Soal Pilihan Ganda Kompleks",
+                3: "Soal Memasangkan", 
+                4: "Jawaban Singkat",
+                5: "Survey Lingkungan Belajar"
+            };
+            
+            document.getElementById('stageMessage').textContent = 
+                `Anda akan memulai ${stageNames[nextStage]}. Apakah Anda siap melanjutkan?`;
+            document.getElementById('stageModal').classList.remove('hidden');
+        }
+
+        // Confirm stage
+        function confirmStage() {
+            currentStage++;
+            currentQuestion = 0;
+            closeStageModal();
+            loadQuestion();
+            generateQuestionGrid();
+        }
+
+        // Close stage modal
+        function closeStageModal() {
+            document.getElementById('stageModal').classList.add('hidden');
+        }
+
+        // Mark as doubt
+        function markDoubt() {
+            const questionId = getQuestionId();
+            if (doubtQuestions.has(questionId)) {
+                doubtQuestions.delete(questionId);
+            } else {
+                doubtQuestions.add(questionId);
+            }
+            generateQuestionGrid();
+        }
+
+        // Update next button text
+        function updateNextButton() {
+            const nextBtn = document.getElementById('nextBtn');
+            const stageData = questions[`stage${currentStage}`];
+            
+            if (currentQuestion === stageData.questions.length - 1) {
+                if (currentStage === 5) {
+                    nextBtn.textContent = 'Selesai';
+                } else {
+                    nextBtn.textContent = 'Tahap Selanjutnya';
+                }
+            } else {
+                nextBtn.textContent = 'Soal Selanjutnya';
+            }
+        }
+
+        // Generate question grid for navigation
+        function generateQuestionGrid() {
+            const grid = document.getElementById('questionGrid');
+            grid.innerHTML = '';
+            
+            for (let stage = 1; stage <= 5; stage++) {
+                const stageQuestions = questions[`stage${stage}`].questions;
+                for (let q = 0; q < stageQuestions.length; q++) {
+                    const questionId = `stage${stage}_q${q}`;
+                    const btn = document.createElement('div');
+                    btn.className = 'question-nav-btn';
+                    btn.textContent = getTotalQuestionNumber(stage, q);
+                    btn.onclick = () => navigateToQuestion(stage, q);
+                    
+                    if (stage === currentStage && q === currentQuestion) {
+                        btn.classList.add('current');
+                    } else if (answers[questionId]) {
+                        btn.classList.add('answered');
+                    } else {
+                        btn.classList.add('unanswered');
+                    }
+                    
+                    if (doubtQuestions.has(questionId)) {
+                        btn.classList.add('doubt');
+                    }
+                    
+                    grid.appendChild(btn);
+                }
+            }
+        }
+
+        // Get total question number across all stages
+        function getTotalQuestionNumber(stage, questionIndex) {
+            let total = 0;
+            for (let s = 1; s < stage; s++) {
+                total += questions[`stage${s}`].questions.length;
+            }
+            return total + questionIndex + 1;
+        }
+
+        // Navigate to specific question
+        function navigateToQuestion(stage, questionIndex) {
+            saveAnswer();
+            currentStage = stage;
+            currentQuestion = questionIndex;
+            loadQuestion();
+            generateQuestionGrid();
+            toggleQuestionList();
+        }
+
+        // Toggle question list modal
+        function toggleQuestionList() {
+            const modal = document.getElementById('questionListModal');
+            modal.classList.toggle('hidden');
+        }
+
+        // Start timer
+        function startTimer() {
+            const timerInterval = setInterval(() => {
+                timeRemaining--;
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                document.getElementById('timer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    finishTest();
+                }
+            }, 1000);
+        }
+
+        // Finish test
+        function finishTest() {
+            saveAnswer();
+            alert('Ujian selesai! Terima kasih telah mengikuti tes.');
+            // Here you would typically submit the answers to a server
+            console.log('Answers:', answers);
+            console.log('Doubt questions:', Array.from(doubtQuestions));
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserData(); // Load user data from Google Sheets
+            initializeDateDropdowns();
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+        });
+
+        // Handle Enter key for login
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !document.getElementById('loginPage').classList.contains('hidden')) {
+                login();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'967d6787b1e8ce73',t:'MTc1Mzk2ODE0NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
